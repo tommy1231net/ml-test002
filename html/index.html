@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ML Prediction: Penguin Weight</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        .container { max-width: 500px; }
+        label { display: block; margin-top: 10px; }
+        input, select { width: 100%; padding: 5px; }
+        button { margin-top: 20px; padding: 10px; width: 100%; cursor: pointer; }
+        #result { margin-top: 20px; font-weight: bold; color: #2c3e50; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #0000ff">
+            Infrastructure:
+        </h2>
+        <h2 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #0000ff">
+            Provisioned via Terraform Managed Code
+        </h2>
+        <h2 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #34495e;">
+            ML Prediction: <span style="font-size: 0.8em; color: #7f8c8d;">How heavy is that penguin?🐧</span>
+        </h2>
+        <table>
+            <tr>
+                <td>
+                    <div class="image-area">
+                      <img id="target-image" src="Adelie.png" alt="Selected Penguin Image" style="width: 40%;">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Penguin Species: ペンギン種
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select id="species" onchange="changeImage()">
+                        <option value="Adelie">Adelie: アデリー</option>
+                        <option value="Chinstrap">Chinstrap: ヒゲ</option>
+                        <option value="Gentoo">Gentoo: ジェンツー</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Islands they live on: 生息する島
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select id="island">
+                        <option value="Torgersen">Torgersen</option>
+                        <option value="Biscoe">Biscoe</option>
+                        <option value="Dream">Dream</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Bill length(mm): くちばしの長さ
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="number" id="bill_l" value="50">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Bill Depth(mm): くちばしの深さ
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="number" id="bill_d" value="20">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Flipper Lenght(mm): 羽の長さ
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="number" id="flipper" value="200">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Sex: 性別
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select id="sex">
+                        <option value="MALE">Male: オス</option>
+                        <option value="FEMALE">Female: メス</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button onclick="predict()">Display Weight Prediction Below: 体重予測を下に表示</button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div id="result"></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        function changeImage() {
+          const selector = document.getElementById('species');
+          const image = document.getElementById('target-image');
+  
+          // 選択されたvalueの値をimgタグのsrcに代入
+          image.src = selector.value + ".png";
+        }
+        
+        async function predict() {
+            const resultDiv = document.getElementById('result');
+            const url = "https://penguin2-api-528352551348.asia-northeast1.run.app/predict";
+        
+            // 1. 「計算中」の状態にする
+            resultDiv.innerText = "⏳ 予測計算中...";
+            resultDiv.style.color = "#2c3e50"; // 通常の色に戻す
+        
+            const data = {
+                species: document.getElementById('species').value,
+                island: document.getElementById('island').value,
+                bill_length_mm: parseFloat(document.getElementById('bill_l').value),
+                bill_depth_mm: parseFloat(document.getElementById('bill_d').value),
+                flipper_length_mm: parseFloat(document.getElementById('flipper').value),
+                sex: document.getElementById('sex').value
+            };
+
+            try {
+                // 2. APIリクエスト実行
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                // レスポンスが正常（200 OK）でない場合
+                if (!res.ok) {
+                    throw new Error(`APIエラー: ${res.status} ${res.statusText}`);
+                }
+        
+                const result = await res.json();
+        
+                // 3. 成功時の表示
+                resultDiv.innerText = "✅ 予測体重: " + Math.round(result.predicted_body_mass_g) + " g";
+
+            } catch (error) {
+                // 4. エラー時の表示
+                console.error("Error details:", error);
+                resultDiv.innerText = "エラーが発生しました: " + error.message;
+                resultDiv.style.color = "red"; // エラーは赤字で目立たせる
+            }
+        }
+    </script>
+</body>
+</html>
