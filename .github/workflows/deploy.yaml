@@ -44,7 +44,7 @@ jobs:
   deploy-dev:
     needs: build-and-push
     runs-on: ubuntu-latest
-    environment: development
+    environment: production
     steps:
       - name: Google Auth
         uses: google-github-actions/auth@v2
