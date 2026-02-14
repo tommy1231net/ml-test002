@@ -41,7 +41,7 @@ jobs:
           echo "IMAGE_DIGEST=$DIGEST" >> $GITHUB_OUTPUT
           echo "IMAGE_PATH=$IMAGE" >> $GITHUB_OUTPUT
 
-  deploy-dev:
+  deploy-prod:
     needs: build-and-push
     runs-on: ubuntu-latest
     environment: production
