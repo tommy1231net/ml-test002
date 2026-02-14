@@ -33,6 +33,7 @@ jobs:
           IMAGE="asia-northeast1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/penguin-api/penguin-api:${{ github.sha }}"
           
           gcloud builds submit \
+            --project ${{ vars.GCP_PROJECT_ID }} \
             --tag $IMAGE \
             --gcs-source-staging-dir="gs://ml-test002-build/source" \
             --quiet .
