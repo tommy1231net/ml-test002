@@ -32,6 +32,8 @@ jobs:
         run: |
           IMAGE="asia-northeast1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/penguin-api/penguin-api:${{ github.sha }}"
           
+          gcloud config set project ${{ vars.GCP_PROJECT_ID }}
+
           gcloud builds submit \
             --project ${{ vars.GCP_PROJECT_ID }} \
             --tag $IMAGE \
