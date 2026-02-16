@@ -38,6 +38,7 @@ jobs:
             --project ${{ vars.GCP_PROJECT_ID }} \
             --tag $IMAGE \
             --gcs-source-staging-dir="gs://ml-test002-build/source" \
+            --default-buckets-behavior=none \
             --quiet .
 
           DIGEST=$(gcloud container images describe $IMAGE --format='get(image_summary.digest)')
